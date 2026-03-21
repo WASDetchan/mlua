@@ -86,42 +86,40 @@ pub fn userdata(input: TokenStream1) -> TokenStream1 {
         None => quote! { where Self: ::mlua::FromLua },
     };
 
-    let fields = find_fields_with_attr(&data, "field").chain(find_fields_with_attr(&data, "field_mut"));
-    let fields_mut = find_fields_with_attr(&data, "field_mut");
+    let fields = find_fields_with_attr(&data, "field").chain(find_fields_with_attr(&data, "field_mut")).collect::<Vec<_>>();
+    let fields_mut = find_fields_with_attr(&data, "field_mut").collect::<Vec<_>>();
 
-    let getters = fields.map(|(field, attr, index)| {
+    let getters = fields.iter().copied().map(|(field, attr, index)| {
         let name = match get_field_name(field, attr) {
             Ok(v) => v,
             Err(e) => return e.to_compile_error(),
         };
-        let field_span = field.span();
 
         match &field.ident {
             None => {
                 let ident = Index::from(index);
-                quote_spanned! {field_span=>
-                    fields.add_field_method_get(#name, |_, this| Ok(this.#ident));
+                quote_spanned! {field.ty.span()=>
+                    fields.add_field_method_get(#name, |_, this| Ok(::core::clone::Clone::clone(&this.#ident)));
                 }
             }
 
             Some(ident) => {
-                quote_spanned! {field_span=>
-                    fields.add_field_method_get(#name, |_, this| Ok(this.#ident));
+                quote_spanned! {field.ty.span()=>
+                    fields.add_field_method_get(#name, |_, this| Ok(::core::clone::Clone::clone(&this.#ident)));
                 }
             }
         }
     });
-    let setters = fields_mut.map(|(field, attr, index)| {
+    let setters = fields_mut.iter().copied().map(|(field, attr, index)| {
         let name = match get_field_name(field, attr) {
             Ok(v) => v,
             Err(e) => return e.to_compile_error(),
         };
-        let field_span = field.span();
 
         match &field.ident {
             None => {
                 let ident = Index::from(index);
-                quote_spanned! {field_span=>
+                quote_spanned! {field.ty.span()=>
                     fields.add_field_method_set(#name, |_, this, val| {
                         this.#ident = val;
                         Ok(())
@@ -130,7 +128,7 @@ pub fn userdata(input: TokenStream1) -> TokenStream1 {
             }
 
             Some(ident) => {
-                quote_spanned! {field_span=>
+                quote_spanned! {field.ty.span()=>
                     fields.add_field_method_set(#name, |_, this, val| {
                         this.#ident = val;
                         Ok(())
@@ -141,13 +139,13 @@ pub fn userdata(input: TokenStream1) -> TokenStream1 {
     });
 
     quote! {
-      impl #impl_generics ::mlua::UserData for #ident #ty_generics #where_clause {
-        fn add_fields<F: ::mlua::UserDataFields<Self>>(fields: &mut F) {
-            #(#getters)*
-            #(#setters)*
+        impl #impl_generics ::mlua::UserData for #ident #ty_generics #where_clause {
+            fn add_fields<F: ::mlua::UserDataFields<Self>>(fields: &mut F) {
+                #(#getters)*
+                #(#setters)*
+            }
+            fn add_methods<M: ::mlua::UserDataMethods<Self>>(methods: &mut M) {}
         }
-        fn add_methods<M: ::mlua::UserDataMethods<Self>>(methods: &mut M) {}
-      }
     }
     .into()
 }

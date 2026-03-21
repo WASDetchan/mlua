@@ -1,0 +1,26 @@
+error[E0277]: the trait bound `NotIntoLua: IntoLua` is not satisfied
+ --> tests/userdata_derive/non_into_lua_field.rs:9:8
+  |
+9 |     f: NotIntoLua,
+  |        ^^^^^^^^^^ unsatisfied trait bound
+  |
+help: the trait `LuaUserData` is not implemented for `NotIntoLua`
+ --> tests/userdata_derive/non_into_lua_field.rs:4:1
+  |
+4 | struct NotIntoLua(u64);
+  | ^^^^^^^^^^^^^^^^^
+help: the trait `LuaUserData` is implemented for `UserDataFieldsNotIntoLua`
+ --> tests/userdata_derive/non_into_lua_field.rs:6:26
+  |
+6 | #[derive(Clone, FromLua, UserData)]
+  |                          ^^^^^^^^
+  = note: required for `NotIntoLua` to implement `IntoLua`
+note: required by a bound in `add_field_method_get`
+ --> src/userdata.rs
+  |
+  |     fn add_field_method_get<M, R>(&mut self, name: impl Into<String>, method: M)
+  |        -------------------- required by a bound in this associated function
+...
+  |         R: IntoLua;
+  |            ^^^^^^^ required by this bound in `UserDataFields::add_field_method_get`
+  = note: this error originates in the derive macro `UserData` (in Nightly builds, run with -Z macro-backtrace for more info)

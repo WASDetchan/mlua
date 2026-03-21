@@ -1,0 +1,14 @@
+error[E0277]: the trait bound `NotClone: Clone` is not satisfied
+  --> tests/userdata_derive/non_clone_field.rs:22:5
+   |
+22 |     f: NotClone,
+   |     ^^^--------
+   |     |  |
+   |     |  required by a bound introduced by this call
+   |     the trait `Clone` is not implemented for `NotClone`
+   |
+help: consider annotating `NotClone` with `#[derive(Clone)]`
+   |
+ 3 + #[derive(Clone)]
+ 4 | struct NotClone(u64);
+   |

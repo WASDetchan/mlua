@@ -43,6 +43,26 @@ fn test_userdata_fields_mut() {
     assert_eq!(chunk.eval::<f64>().unwrap(), 36.0);
 }
 
+#[derive(Clone, FromLua, UserData)]
+struct UserDataFieldsNotCopy {
+    #[field]
+    f: String,
+}
+
+#[test]
+fn test_userdata_fields_non_copy() {
+    let lua = Lua::new();
+    lua.globals()
+        .set("A", UserDataFieldsNotCopy { f: "hi!".into() })
+        .unwrap();
+    let chunk = lua.load(
+        r#"
+    return A.f
+    "#,
+    );
+    assert_eq!(chunk.eval::<String>().unwrap().as_str(), "hi!");
+}
+
 #[test]
 fn test_userdata_derive_error_messages() {
     let t = trybuild::TestCases::new();
