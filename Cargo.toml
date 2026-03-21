@@ -86,6 +86,11 @@ tokio = { version = "1.0", features = ["full"] }
 [lints.rust]
 unexpected_cfgs = { level = "allow", check-cfg = ['cfg(tarpaulin_include)'] }
 
+[[test]]
+name = "userdata_derive"
+path = "tests/userdata_derive.rs"
+required-features = ["macros"]
+
 [[bench]]
 name = "benchmark"
 harness = false
