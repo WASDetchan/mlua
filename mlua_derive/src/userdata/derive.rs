@@ -53,7 +53,7 @@ fn get_field_name(field: &Field, attr: &Attribute) -> Result<String, Error> {
                     Expr::Lit(ExprLit { lit: Lit::Str(s), .. }) => Ok(s.value()),
                     _ => Err(Error::new(
                         nv.value.span(),
-                        "invalid field name, must be a string literal!",
+                        "invalid field name, must be a string literal",
                     )),
                 }
             } else {
@@ -146,7 +146,7 @@ pub fn userdata(input: TokenStream1) -> TokenStream1 {
             #(#getters)*
             #(#setters)*
         }
-        fn add_methods<M: LuaUserDataMethods<Self>>(methods: &mut M) {}
+        fn add_methods<M: ::mlua::UserDataMethods<Self>>(methods: &mut M) {}
       }
     }
     .into()

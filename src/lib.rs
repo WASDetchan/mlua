@@ -232,6 +232,16 @@ pub use mlua_derive::chunk;
 #[cfg_attr(docsrs, doc(cfg(feature = "macros")))]
 pub use mlua_derive::FromLua;
 
+/// Derive [`UserData`] for a Rust type.
+///
+/// Currently only fields of a struct are supported. To add field to the [`UserData`] implementation place a
+/// `#[field]` or `[field_mut]` attribute on a struct's field. By default, field's name in lua is
+/// the same as in rust, but it can be overriden: `#[field(name = "new_name")]
+///
+#[cfg(feature = "macros")]
+#[cfg_attr(docsrs, doc(cfg(feature = "macros")))]
+pub use mlua_derive::UserData;
+
 /// Registers Lua module entrypoint.
 ///
 /// You can register multiple entrypoints as required.

@@ -1,0 +1,5 @@
+error: #[field] or #[field_mut] without name can only be used on a named field
+ --> tests/userdata_derive/unnamed_field.rs:2:19
+  |
+2 | struct MyStruct(#[field] u64);
+  |                   ^^^^^

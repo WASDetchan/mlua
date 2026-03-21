@@ -1,0 +1,5 @@
+error: invalid #[field] or #[field_mut] attribute. Valid variants: #[field], #[field(name = "name")]
+ --> tests/userdata_derive/invalid_field_attr.rs:3:7
+  |
+3 |     #[field = "name"]
+  |       ^^^^^

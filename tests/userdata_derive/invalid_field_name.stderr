@@ -1,0 +1,5 @@
+error: invalid field name, must be a string literal
+ --> tests/userdata_derive/invalid_field_name.rs:2:32
+  |
+2 | struct MyStruct(#[field(name = 15)] u64);
+  |                                ^^
